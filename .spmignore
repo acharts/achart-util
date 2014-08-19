@@ -2,7 +2,7 @@ dist
 _site
 sea-modules
 node_modules
-spm-modules
+spm_modules
 .git
 tests
 examples
