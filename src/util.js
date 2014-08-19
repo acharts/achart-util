@@ -76,7 +76,7 @@ function animTime(duration,fn,callback){
         return ;
       }
 
-      var factor = Math.pow(durTime/duration, .48);
+      var factor = Math.pow(durTime/duration, 1.7);
       fn(factor,num);
       HANDLERS[uid] =  Util.requestAnimationFrame(function(){
         next(num+1,fn,duration,callback);
@@ -110,9 +110,9 @@ function deepMix(dst,src,level){
           dst[k] = src[k];
         }
       }else if(Util.isArray(value)){
-        if(!Util.isArray(dst[k])){
-          dst[k] = [];
-        }
+        //if(!Util.isArray(dst[k])){
+        dst[k] = [];
+        //}
         dst[k] = dst[k].concat(value);
       }else if(value !== undefined){
         dst[k] = src[k];
@@ -122,7 +122,7 @@ function deepMix(dst,src,level){
 }
 
 /**
- * @class Acharts.Util
+ * @class Chart.Util
  * @singleton
  * 绘图的工具类
  */
@@ -541,6 +541,29 @@ var Util = {
 };
 
 
+var ARR_EV = ['srcElement','toElement','clientX','clientY','keyCode'];
+
+function getEventObj(ev){
+  var  rst = {};
+  rst.target = ev.srcElement;
+  rst.pageX = ev.clientX + document.body.scrollLeft - document.body.clientLeft;
+  rst.pageY = ev.clientY + document.body.scrollTop - document.body.clientTop;
+  Util.each(ARR_EV,function(key){
+    rst[key] = ev[key];
+  });
+  return rst;
+}
+
+var fragmentRE = /^\s*<(\w+|!)[^>]*>/,
+  table = document.createElement('table'),
+  tableRow = document.createElement('tr'),
+  containers = {
+      'tr': document.createElement('tbody'),
+      'tbody': table, 'thead': table, 'tfoot': table,
+      'td': tableRow, 'th': tableRow,
+      '*': document.createElement('div')
+  };
+
 Util.mix(Util,{
 
 
@@ -554,7 +577,22 @@ Util.mix(Util,{
    * @type {Boolean}
    */
   svg : Raphael.svg,
+  /**
+   * 创建DOM 节点
+   * @param  {String} str Dom 字符串
+   * @return {HTMLElement}  DOM 节点
+   */
+  createDom : function(str){
+    var name = fragmentRE.test(str) && RegExp.$1;
 
+    if (!(name in containers)){
+      name = '*'
+    }
+    container = containers[name];
+    str = str.replace(/(^\s*)|(\s*$)/g, "");
+    container.innerHTML = '' + str;
+    return container.childNodes[0];
+  },
   getOffset : function(o){
     var rst = {},
       left = 0,
@@ -563,13 +601,106 @@ Util.mix(Util,{
     
         left += (o.offsetLeft || 0);
         top += (o.offsetTop || 0);
-        o = (o.offsetParent || o.parentNode);
+        o = o.offsetParent;
     };
     rst.top = top;
     rst.left = left;
     return rst;
   },
+  /**
+   * 是否包含指定节点
+   * @param  {HTMLElement} node    节点
+   * @param  {HTMLElement} subNode 子节点
+   * @return {HTMLElement} 是否包含在节点中
+   */
+  contains : function(node,subNode){
+      if(!node || !subNode){
+        return false;
+      }
+      var rst = false,
+        parent = subNode.parentNode;
+      while(parent!=null && parent!=document.body){
+        if(parent == node){
+          rst = true;
+          break;
+        }
+        parent = parent.parentNode;
+      }
 
+      return rst;
+  },
+  /**
+   * 获取宽度
+   * @param  {HTMLElement} el  dom节点
+   * @return {Number} 宽度
+   */
+  getWidth : function(el){
+    var width = Util.getStyle(el,'width');
+    if(width == 'auto'){
+      width = el.offsetWidth;
+    }
+    return parseFloat(width);
+  },
+   /**
+   * 获取高度
+   * @param  {HTMLElement} el  dom节点
+   * @return {Number} 高度
+   */
+  getHeight : function(el){
+    var height = Util.getStyle(el,'height');
+    if(height == 'auto'){
+      height = el.offsetHeight;
+    }
+    return parseFloat(height);
+  },
+  getOuterWidth : function(el){
+    var width = Util.getWidth(el),
+      bLeft = parseFloat(Util.getStyle(el,'borderLeftWidth')) || 0,
+      pLeft = parseFloat(Util.getStyle(el,'paddingLeft')),
+      pRight = parseFloat(Util.getStyle(el,'paddingRight')),
+      bRight = parseFloat(Util.getStyle(el,'borderRightWidth')) || 0;
+
+    return width + bLeft + bRight + pLeft + pRight;
+  },
+  getOuterHeight : function(el){
+     var height = Util.getHeight(el),
+      bTop = parseFloat(Util.getStyle(el,'borderTopWidth')) || 0,
+      pTop = parseFloat(Util.getStyle(el,'paddingTop')),
+      pBottom = parseFloat(Util.getStyle(el,'paddingBottom')),
+      bBottom = parseFloat(Util.getStyle(el,'borderBottomWidth')) || 0;
+
+    return height + bTop + bBottom + pTop + pBottom;
+  },
+  /**
+   * 获取样式
+   * @param  {HTMLElement} el  dom节点
+   * @param  {String} name 样式名
+   * @return {String} 属性值
+   */
+  getStyle : function(el,name){
+    if(window.getComputedStyle){
+      return window.getComputedStyle(el,null)[name];
+    }
+    return el.currentStyle[name];
+  },
+  addEvent : function( obj, type, fn ) {
+    if ( obj.attachEvent ) {
+        obj['e'+type+fn] = fn;
+        obj[type+fn] = function(){
+          window.event.target = window.event.srcElement;
+          obj['e'+type+fn]( getEventObj(window.event) );
+        }
+        obj.attachEvent( 'on'+type, obj[type+fn] );
+    } else
+        obj.addEventListener( type, fn, false );
+  },
+  removeEvent : function( obj, type, fn ) {
+      if ( obj.detachEvent ) {
+          obj.detachEvent( 'on'+type, obj[type+fn] );
+          obj[type+fn] = null;
+      } else
+          obj.removeEventListener( type, fn, false );
+  },
   angle : function(x1, y1, x2, y2){
     return Raphael.angle(x1, y1, x2, y2);
   },
@@ -780,3 +911,4 @@ Util.mix(Util,{
 });
 
 module.exports = Util;
+

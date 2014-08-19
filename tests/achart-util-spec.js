@@ -1,7 +1,9 @@
 
 var  expect = require('expect.js'),
     sinon = require('sinon'),
-    Util = require('../src/util');
+    Util = require('../src/util'),
+    $ = require('jquery');
+
 
 describe('test basic util',function(){
 
@@ -446,6 +448,39 @@ describe('test util with raphael',function(){
         expect(Util.dark(c,.15)).to.be('#d8d8d8');
     });
 });
+
+describe('dom',function(){
+
+    it('create dom',function(){
+        var str = '<div id="t1"></div>',
+            dom = Util.createDom(str);
+        document.body.appendChild(dom);
+        expect(dom).not.to.be('undefined');
+        expect(document.getElementById('t1')).to.be(dom);
+
+        expect($(dom).width()).to.be(Util.getWidth(dom));
+    });
+
+    it('create tr',function(){
+        var str = '<tr id="t2"></tr>',
+            dom = Util.createDom(str);
+        expect(dom).not.to.be('undefined');
+        expect(Util.isString(dom)).not.to.be(true);
+    });
+
+    it('addevent,removeEvnet',function(){
+
+    });
+
+    it('getOffset',function(){
+        
+    });
+
+    it('contains',function(){
+
+    });
+});
+
 
 
 

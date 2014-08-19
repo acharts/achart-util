@@ -1,22 +1,21 @@
 {
-  "name": "achart-util",
+  "name": "achart-raphael",
   "version": "1.0.0",
-  "description": "https://github.com/acharts/achart-util",
-  "keywords": ["acharts","acharts util"],
-  "homepage": "",
+  "description": "raphael for acharts",
+  "keywords": ["acharts"],
+  "homepage": "https://github.com/acharts/achart-raphael",
   "author": "dxq613@gmail.com",
   "repository": {
     "type": "git",
-    "url": "https://github.com/acharts/achart-util.git"
+    "url": "https://github.com/acharts/achart-raphael.git"
   },
   "bugs": {
-    "url": ""
+    "url": "https://github.com/acharts/achart-raphael/issues"
   },
   "licenses": "MIT",
   "spm": {
     "main": "index.js",
     "dependencies": {
-      "achart-raphael" : "1.0.0"
     },
     "devDependencies": {
       "expect.js": "0.3.1",
