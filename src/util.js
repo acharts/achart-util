@@ -35,8 +35,11 @@ function ceiling(values,value){
   var length = values.length,
     pre = values[0],
     rst;
-  if(value < values[0] || value > values[length - 1]){
+  if(value > values[length - 1]){
     return NAN;
+  }
+  if(value < values[0]){
+    return values[0];
   }
 
   for (var i = 1; i < values.length; i++) {
@@ -653,6 +656,11 @@ Util.mix(Util,{
     }
     return parseFloat(height);
   },
+  /**
+   * 获取外层宽度
+   * @param  {HTMLElement} el  dom节点
+   * @return {Number} 宽度
+   */
   getOuterWidth : function(el){
     var width = Util.getWidth(el),
       bLeft = parseFloat(Util.getStyle(el,'borderLeftWidth')) || 0,
@@ -662,6 +670,11 @@ Util.mix(Util,{
 
     return width + bLeft + bRight + pLeft + pRight;
   },
+  /**
+   * 获取外城高度
+   * @param  {HTMLElement} el  dom节点
+   * @return {Number} 高度
+   */
   getOuterHeight : function(el){
      var height = Util.getHeight(el),
       bTop = parseFloat(Util.getStyle(el,'borderTopWidth')) || 0,
@@ -683,6 +696,12 @@ Util.mix(Util,{
     }
     return el.currentStyle[name];
   },
+  /**
+   * 添加事件
+   * @param {HTMLElement}   node  节点
+   * @param {String}   type 事件名称
+   * @param {Function} fn   回调函数
+   */
   addEvent : function( obj, type, fn ) {
     if ( obj.attachEvent ) {
         obj['e'+type+fn] = fn;
@@ -694,6 +713,12 @@ Util.mix(Util,{
     } else
         obj.addEventListener( type, fn, false );
   },
+  /**
+   * 移除事件
+   * @param {HTMLElement}   node  节点
+   * @param {String}   type 事件名称
+   * @param {Function} fn   回调函数
+   */
   removeEvent : function( obj, type, fn ) {
       if ( obj.detachEvent ) {
           obj.detachEvent( 'on'+type, obj[type+fn] );
@@ -721,6 +746,15 @@ Util.mix(Util,{
   stopStep : function(handler){
     stopStep(handler);
   },
+  /**
+   * path执行动画
+   * @param  {Chart.Canvas.Shape.Path}   pathShape path图形
+   * @param  {String|Array}   toPath  变换的path
+   * @param  {Number}   reserve   附加几个节点
+   * @param  {Number}   duration  执行时间
+   * @param  {String}   easing    方法
+   * @param  {Function} callback  回调函数
+   */
   animPath : function(pathShape,toPath,reserve,duration,easing,callback){
     //vml阻止动画执行
     /**/
