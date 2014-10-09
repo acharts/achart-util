@@ -554,6 +554,9 @@ function getEventObj(ev){
   Util.each(ARR_EV,function(key){
     rst[key] = ev[key];
   });
+  rst.stopPropagation = function(){
+    window.event.cancelBubble = true;  
+  }
   return rst;
 }
 
@@ -764,6 +767,11 @@ Util.mix(Util,{
     }
     reserve = reserve || 0;
     duration = duration || 400;
+
+    if(!toPath){
+      after();
+      return;
+    }
 
     var curPath = pathShape.getPath(),
       endPath = Util.parsePathString(toPath),
